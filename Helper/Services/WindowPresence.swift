@@ -53,6 +53,10 @@ enum WindowPresence {
                 .takeUnretainedValue() as? NSObject,
             let windows = application.value(forKey: "windows") as? [NSObject]
         else { return }
+        // A hidden app's windows stay hidden when ordered front.
+        if (application.value(forKey: "isHidden") as? Bool) == true {
+            application.perform(NSSelectorFromString("unhideWithoutActivation"))
+        }
         for window in windows {
             if (window.value(forKey: "isMiniaturized") as? Bool) == true {
                 window.perform(NSSelectorFromString("deminiaturize:"), with: nil)
