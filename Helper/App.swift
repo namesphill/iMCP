@@ -52,6 +52,17 @@ struct HelperView: View {
             for scene in UIApplication.shared.connectedScenes {
                 (scene as? UIWindowScene)?.sizeRestrictions?.allowsFullScreen = false
             }
+            // The AppKit window may not exist yet, and window restoration can move it after it does.
+            Task {
+                for delay in [0, 300, 1000] {
+                    try? await Task.sleep(for: .milliseconds(delay))
+                    WindowPresence.placeInTopRightCorner()
+                }
+            }
+        }
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { _ in
+            // The window fits its content, so keep its top edge in the corner when the content grows or shrinks.
+            Task { WindowPresence.placeInTopRightCorner() }
         }
         .alert("Pair iMCP again?", isPresented: $isConfirmingPairAgain) {
             Button("Pair Again", role: .destructive) { runtime.pairAgain() }

@@ -47,23 +47,44 @@ enum WindowPresence {
     /// Deminiaturizes and orders every AppKit window to the front without activating the app.
     /// UIKit on Mac Catalyst has no API for this, so it messages AppKit's windows directly.
     private static func orderFrontWithoutActivating() {
-        guard
-            let application = (NSClassFromString("NSApplication") as AnyObject?)?
-                .perform(NSSelectorFromString("sharedApplication"))?
-                .takeUnretainedValue() as? NSObject,
-            let windows = application.value(forKey: "windows") as? [NSObject]
-        else { return }
+        guard let application = sharedApplication else { return }
         // A hidden app's windows stay hidden when ordered front.
         if (application.value(forKey: "isHidden") as? Bool) == true {
             application.perform(NSSelectorFromString("unhideWithoutActivation"))
         }
-        for window in windows {
+        for window in mainWindows {
             if (window.value(forKey: "isMiniaturized") as? Bool) == true {
                 window.perform(NSSelectorFromString("deminiaturize:"), with: nil)
             }
-            if (window.value(forKey: "canBecomeMainWindow") as? Bool) == true {
-                window.perform(NSSelectorFromString("orderFrontRegardless"))
-            }
+            window.perform(NSSelectorFromString("orderFrontRegardless"))
         }
+        placeInTopRightCorner()
+    }
+
+    /// Moves the window to the top-right corner of the primary display (the one with the menu bar),
+    /// so it stays out of the way when it comes forward on its own.
+    static func placeInTopRightCorner(margin: CGFloat = 12) {
+        guard
+            let screens = (NSClassFromString("NSScreen") as AnyObject?)?.value(forKey: "screens") as? [NSObject],
+            let visible = (screens.first?.value(forKey: "visibleFrame") as? NSValue)?.cgRectValue
+        else { return }
+        for window in mainWindows {
+            guard let frame = (window.value(forKey: "frame") as? NSValue)?.cgRectValue else { continue }
+            // AppKit's origin is the bottom-left corner, and visibleFrame excludes the menu bar and Dock.
+            let origin = CGPoint(x: visible.maxX - frame.width - margin, y: visible.maxY - frame.height - margin)
+            guard frame.origin != origin else { continue }
+            window.setValue(NSValue(cgPoint: origin), forKey: "frameOrigin")
+        }
+    }
+
+    private static var sharedApplication: NSObject? {
+        (NSClassFromString("NSApplication") as AnyObject?)?
+            .perform(NSSelectorFromString("sharedApplication"))?
+            .takeUnretainedValue() as? NSObject
+    }
+
+    private static var mainWindows: [NSObject] {
+        let windows = sharedApplication?.value(forKey: "windows") as? [NSObject] ?? []
+        return windows.filter { ($0.value(forKey: "canBecomeMainWindow") as? Bool) == true }
     }
 }
