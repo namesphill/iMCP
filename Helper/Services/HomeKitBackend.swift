@@ -6,6 +6,8 @@ final class HomeKitBackend: HomeBackend {
     let store = HomeKitStore()
 
     func call(_ tool: String, _ input: [String: Value]) async throws -> Value {
+        IdleQuit.callStarted()
+        defer { IdleQuit.callEnded() }
         do {
             try await store.ensureLoaded()
             await WindowPresence.ensureForeground()

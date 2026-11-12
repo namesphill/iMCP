@@ -689,6 +689,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HELPER_BUNDLE_IDENTIFIER = co.dododo.iMCP.Helper;
 				INFOPLIST_FILE = Helper/Info.plist;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_NSHomeKitUsageDescription = "iMCP uses HomeKit to inspect and organize your homes, accessories, scenes, and automations.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "iMCP connects to iMCP Helper on this Mac.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -728,6 +729,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HELPER_BUNDLE_IDENTIFIER = co.dododo.iMCP.Helper;
 				INFOPLIST_FILE = Helper/Info.plist;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_NSHomeKitUsageDescription = "iMCP uses HomeKit to inspect and organize your homes, accessories, scenes, and automations.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "iMCP connects to iMCP Helper on this Mac.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

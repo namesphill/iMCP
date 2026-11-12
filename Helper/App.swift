@@ -173,7 +173,9 @@ final class HelperRuntime: ObservableObject {
     /// Why the listener stopped, which the window shows instead of the HomeKit status.
     @Published private(set) var listenerFailure: Status?
     var status: Status { listenerFailure ?? homeKitStatus }
-    @Published private(set) var pairing: Pairing?
+    @Published private(set) var pairing: Pairing? {
+        didSet { IdleQuit.isPaired = pairing == .paired }
+    }
     /// Whether the listener is ready and advertised.
     @Published private(set) var isListening = false
     /// Whether a listener change is running.
@@ -207,7 +209,10 @@ final class HelperRuntime: ObservableObject {
         }
     }
 
-    func start() { changes.yield(.start) }
+    func start() {
+        IdleQuit.start()
+        changes.yield(.start)
+    }
 
     func retry() {
         canRetry = false
