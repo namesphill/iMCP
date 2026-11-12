@@ -8,7 +8,14 @@ final class HomeKitBackend: HomeBackend {
     func call(_ tool: String, _ input: [String: Value]) async throws -> Value {
         do {
             try await store.ensureLoaded()
-            return try await dispatch(tool, HomeArguments(input))
+            await WindowPresence.ensureForeground()
+            do {
+                return try await dispatch(tool, HomeArguments(input))
+            } catch where HomeError.isPossibleWindowRefusal(error as NSError) {
+                // The scene can leave the foreground between the check and the call.
+                await WindowPresence.ensureForeground(force: true)
+                return try await dispatch(tool, HomeArguments(input))
+            }
         } catch {
             throw HomeError(homeErrorMessage(error))
         }

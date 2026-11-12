@@ -109,6 +109,7 @@ build_helper() {
     xcodebuild -quiet -project "$repo/iMCP.xcodeproj" -scheme "iMCP Helper" \
         -configuration Release -destination "$1" \
         -derivedDataPath "$build_dir" -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+        SYMROOT="$build_dir/Build/Products" OBJROOT="$build_dir/Build/Intermediates.noindex" \
         CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="$team" HELPER_BUNDLE_IDENTIFIER="$bundle_id" \
         build
 }
